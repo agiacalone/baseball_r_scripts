@@ -36,6 +36,7 @@ season_games <- function(season) {
       home_id = teams_home_team_id,
       series_description
     ) %>%
+    mutate(game_date = with_tz(ymd_hms(game_date, tz = "UTC"), tzone = "America/Los_Angeles")) %>%
     mutate(
       game_datetime = ymd_hms(game_date),
       date = as.Date(game_datetime),
@@ -61,6 +62,7 @@ team_games <- function(teamID, season) {
       home_id = teams_home_team_id,
       series_description
     ) %>%
+    mutate(game_date = with_tz(ymd_hms(game_date, tz = "UTC"), tzone = "America/Los_Angeles")) %>%
     mutate(
       game_datetime = ymd_hms(game_date),
       date = as.Date(game_datetime),
@@ -86,6 +88,7 @@ date_games <- function(gameDate, season) {
       home_id = teams_home_team_id,
       series_description
     ) %>%
+    mutate(game_date = with_tz(ymd_hms(game_date, tz = "UTC"), tzone = "America/Los_Angeles"))
     mutate(
       game_datetime = ymd_hms(game_date),
       date = as.Date(game_datetime),
