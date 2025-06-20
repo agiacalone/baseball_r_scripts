@@ -12,8 +12,9 @@ game_id <- 777522  # replace with your game's gamePk
 # Basic info for the game
 gameinfo <- mlb_game_info(game_id)
 
-# Get the linescore for the game
+# Get the linescore and basic info for the game
 linescore <- mlb_game_linescore(game_id)
+info <- mlb_game_info(game_id)
 
 # Create the full play-by-play data
 pbp <- mlb_pbp(game_id)
