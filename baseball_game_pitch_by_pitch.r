@@ -5,6 +5,7 @@ library(tidyverse)
 library(glue)
 library(tibble)
 library(readr)
+library(knitr)
 
 #### BEGIN VARIABLE SECTION ####
 
@@ -202,6 +203,31 @@ text_recap <- function(pbp_data) {
   return(lines)
 }
 
+output_markdown <- function(box_score, file = "box_score.md") {
+  # Generate Markdown table as a character vector
+  md_table <- knitr::kable(box_score, format = "markdown")
+  # Write to file
+  writeLines(md_table, file)
+  cat("Box score table written to", file, "\n")
+}
+
+# Create Markdown output for half-inning tables (pitch-by-pitch)
+write_half_inning_tables <- function(grouped_list, file = "half_innings.md") {
+  output <- c()
+  for (i in seq_along(grouped_list)) {
+    this_inning <- unique(grouped_list[[i]]$inning)
+    this_half <- unique(grouped_list[[i]]$half)
+    output <- c(
+      output,
+      paste0("\n### Inning ", this_inning, " (", this_half, ")"),
+      knitr::kable(grouped_list[[i]], format = "markdown"),
+      "\n"
+    )
+  }
+  writeLines(output, file)
+  cat("Wrote Markdown tables to", file, "\n")
+}
+
 ### END FUNCTIONS SECTION ###
 
 ### BEGIN MAIN EXECUTION SECTION ###
@@ -247,6 +273,17 @@ pbp_half_angels <- pbp_half(angels_game_id)
 # Group by team and half-inning
 print(giants_grouped <- grouped(pbp_half_giants))
 print(angels_grouped <- grouped(pbp_half_angels))
+
+# Create some pretty Markdown outputs
+output_markdown(date_games, "date_games.md")
+output_markdown(giants_games, "giants_games.md")
+output_markdown(angels_games, "angels_games.md")
+output_markdown(al_standings, "al_standings.md")
+output_markdown(nl_standings, "nl_standings.md")
+output_markdown(giants_boxscore, "giants_box_score.md")
+output_markdown(angels_boxscore, "angels_box_score.md")
+write_half_inning_tables(giants_grouped, "giants_play_by_play.md")
+write_half_inning_tables(angels_grouped, "angels_play_by_play.md")
 
 # Create the text recaps for games
 #print(text_recap_giants <- text_recap(pbp_half_giants))
