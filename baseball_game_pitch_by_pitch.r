@@ -3,11 +3,12 @@ library(retrosheet)
 library(dplyr)
 library(tidyverse)
 library(glue)
+library(tibble)
 library(readr)
 
 season <- 2025
-gameDate <- "2025-06-18"
-teamID <- 137  # San Francisco Giants
+gameDate <- "2025-06-19"
+#teamID <- 137  # San Francisco Giants
 giantsID <- 137  # San Francisco Giants
 angelsID <- 108  # Los Angeles Angels
 dodgersID <- 119  # Los Angeles Dodgers
@@ -15,7 +16,7 @@ metsID <- 121  # New York Mets
 padresID <- 135  # San Diego Padres
 
 # Get the whole game schedule for the given season
-games <- mlb_schedule(season=season)
+all_games <- mlb_schedule(season=season)
 
 # Filtered games for a whole season
 season_games <- mlb_schedule(season=season) %>%
@@ -36,20 +37,26 @@ season_games <- mlb_schedule(season=season) %>%
   arrange(date)
 
 # Get all games for a season by a team
-team_games <- mlb_schedule(season=season) %>%
-  filter(teams_home_team_id == teamID | teams_away_team_id == teamID) %>%
-  select(
-    date,
-    game_pk,
-    awayScore = teams_away_score,
-    homeScore = teams_home_score,
-    awayTeamName = teams_away_team_name,
-    away_id = teams_away_team_id,
-    homeTeamName = teams_home_team_name,
-    home_id = teams_home_team_id,
-    series_description
-  ) %>%
-  arrange(date)
+team_games <- function(teamID, season) {
+  mlb_schedule(season=season) %>%
+    filter(teams_home_team_id == teamID | teams_away_team_id == teamID) %>%
+    select(
+      date,
+      game_pk,
+      awayScore = teams_away_score,
+      homeScore = teams_home_score,
+      awayTeamName = teams_away_team_name,
+      away_id = teams_away_team_id,
+      homeTeamName = teams_home_team_name,
+      home_id = teams_home_team_id,
+      series_description
+    ) %>%
+    arrange(date)
+}
+
+# Get the Giants games for the season
+giants_games <- team_games(giantsID, season)
+angels_games <- team_games(angelsID, season)
 
 # Get all the games for a specific date
 date_games <- mlb_schedule(season=season) %>%
@@ -68,105 +75,166 @@ date_games <- mlb_schedule(season=season) %>%
   arrange(date)
 
 # Get standings for the American League
-al_standings <- mlb_standings(season = season, league_id = 103) %>%
-  select(
-    Rank = team_records_division_rank,
-    Division = division_id,
-    Team = team_records_team_name,
-    Wins = team_records_wins,
-    Losses = team_records_losses,
-    GB = team_records_games_back,
-    WLpct = team_records_winning_percentage
-  ) %>%
-  arrange(Division, as.numeric(Rank))
-
-# Also get standings for the National League
-nl_standings <- mlb_standings(season = season, league_id = 104) %>%
-  select(
-    Rank = team_records_division_rank,
-    Division = division_id,
-    Team = team_records_team_name,
-    Wins = team_records_wins,
-    Losses = team_records_losses,
-    GB = team_records_games_back,
-    WLpct = team_records_winning_percentage
-  ) %>%
-  arrange(Division, as.numeric(Rank))
-
-# Retrosheet has data too
-retrosheet_gamelog <- get_retrosheet("play", season, "SFN")
-retrosheet_schedule <- get_retrosheet("schedule", season)
-
-# Find the game and create data frames
-game_id <- mlb_schedule(season=season) %>%
-  filter((teams_home_team_id == teamID | teams_away_team_id == teamID) & date == gameDate) %>%
-  pull(game_pk)
-
-# Basic info for the game
-gameinfo <- mlb_game_info(game_id)
-
-# Get the linescore and basic info for the game
-linescore <- mlb_game_linescore(game_id)
-info <- mlb_game_info(game_id)
-
-# Create the summary of the play-by-play game
-pbp_summary <- mlb_pbp(game_id) %>%
-  select(
-    at_bat = about.atBatIndex,
-    pitch_in_ab = index,
-    inning = about.inning,
-    half = about.halfInning,
-    pitchnum = pitchNumber,
-    awayscore = details.awayScore,
-    homescore = details.homeScore,
-    outs = count.outs.start,
-    detail = details.code,
-    batter = matchup.batter.fullName,
-    pitcher = matchup.pitcher.fullName,
-    description = details.description
-  ) %>%
-  arrange(at_bat, pitch_in_ab)
-
-# Select and sort
-pbp_half <- mlb_pbp(game_id) %>%
-  select(
-    inning = about.inning,
-    half = about.halfInning,
-    at_bat = about.atBatIndex,
-    pitch_in_ab = index,
-    awayscore = details.awayScore,
-    homescore = details.homeScore,
-    outs = count.outs.start,
-    batter = matchup.batter.fullName,
-    pitcher = matchup.pitcher.fullName,
-    description = details.description
-  ) %>%
-  arrange(at_bat, pitch_in_ab, inning, half)
-
-# Group by half-inning
-grouped <- pbp_half %>%
-  group_by(inning, half) %>%
-  group_split()
-
-# Compose a nice text recap
-lines <- c()
-for (half_frame in grouped) {
-  this_inning <- half_frame$inning[1]
-  this_half <- half_frame$half[1]
-  header <- glue::glue("\n--- {stringr::str_to_title(this_half)} of Inning {this_inning} ---\n")
-  lines <- c(lines, header)
-  
-  for (i in seq_len(nrow(half_frame))) {
-    play <- half_frame[i, ]
-    play_line <- glue::glue(
-      "Batter: {play$batter} | Pitcher: {play$pitcher}\n  {play$description}"
-    )
-    lines <- c(lines, play_line)
-  }
+standings <- function(season, league_id) {
+  mlb_standings(season = season, league_id = league_id) %>%
+    select(
+      Rank = team_records_division_rank,
+      Division = division_id,
+      Team = team_records_team_name,
+      Wins = team_records_wins,
+      Losses = team_records_losses,
+      GB = team_records_games_back,
+      WLPct = team_records_winning_percentage
+    ) %>%
+    arrange(Division, as.numeric(Rank))
 }
 
-# Write to file
-write_lines(lines, "pbp_half_inning_recaps.txt")
+# Get the standings for the American and National Leagues
+al_standings <- standings(season, league_id = 103)
+nl_standings <- standings(season, league_id = 104)
 
-# Optional: print first 50 lines in console for preview
+# Get the game ID for a specific game date and team
+game_ident <- function(teamID, gameDate) {
+  game_ident <- mlb_schedule(season=season) %>%
+  filter((teams_home_team_id == teamID | teams_away_team_id == teamID) & date == gameDate) %>%
+  pull(game_pk)
+  }
+
+# Set the game ID for the SF Giants and LA Angels
+giants_game_id <- game_ident(giantsID, gameDate)
+angels_game_id <- game_ident(angelsID, gameDate)
+
+# Basic info for the game
+gameinfo <- function(game_ident) {
+  mlb_game_info(game_ident)
+}
+
+# Get info for Giants
+giants_game_info <- gameinfo(giants_game_id)
+angels_game_info <- gameinfo(angels_game_id)
+
+# Get the linescore and basic info for the game
+#linescore <- mlb_game_linescore(game_id)
+giants_linescore <- mlb_game_linescore(giants_game_id)
+angels_linescore <- mlb_game_linescore(angels_game_id)
+
+# Function to create box score
+make_box_score <- function(linescore) {
+  innings <- linescore$num
+  away_runs_by_inning <- as.character(linescore$away_runs)
+  home_runs_by_inning <- as.character(linescore$home_runs)
+  away_team <- unique(linescore$away_team_name)
+  home_team <- unique(linescore$home_team_name)
+  totals <- linescore %>% filter(num == max(num))
+  away_runs_total <- as.character(sum(as.numeric(linescore$away_runs)))
+  home_runs_total <- as.character(sum(as.numeric(linescore$home_runs)))
+  
+  box_score <- tibble(
+    Inning = as.character(innings),
+    !!away_team := away_runs_by_inning,
+    !!home_team := home_runs_by_inning
+  )
+  box_score <- bind_rows(
+    box_score,
+    tibble(
+      Inning = "R",
+      !!away_team := away_runs_total,
+      !!home_team := home_runs_total
+    ),
+    tibble(
+      Inning = "H",
+      !!away_team := as.character(totals$away_hits),
+      !!home_team := as.character(totals$home_hits)
+    ),
+    tibble(
+      Inning = "E",
+      !!away_team := as.character(totals$away_errors),
+      !!home_team := as.character(totals$home_errors)
+    )
+  )
+  return(box_score)
+}
+
+# Make box score
+giants_boxscore <- make_box_score(giants_linescore)
+angels_boxscore <- make_box_score(angels_linescore)
+
+# Create the summary of the play-by-play game
+pbp_summary <- function(game_ident) {
+  mlb_pbp(game_ident) %>%
+    select(
+      at_bat = about.atBatIndex,
+      pitch_in_ab = index,
+      inning = about.inning,
+      half = about.halfInning,
+      pitchnum = pitchNumber,
+      awayscore = details.awayScore,
+      homescore = details.homeScore,
+      outs = count.outs.start,
+      detail = details.code,
+      batter = matchup.batter.fullName,
+      pitcher = matchup.pitcher.fullName,
+      description = details.description
+    ) %>%
+    arrange(at_bat, pitch_in_ab)
+}
+
+# Get the play-by-play data for the Giants game
+pbp_summary_giants <- pbp_summary(giants_game_id)
+
+# Get the play-by-play data for the Angels game
+pbp_summary_angels <- pbp_summary(angels_game_id)
+
+# Select and sort
+pbp_half <- function(game_ident) {
+  mlb_pbp(game_ident) %>%
+    select(
+      inning = about.inning,
+      half = about.halfInning,
+      at_bat = about.atBatIndex,
+      pitch_in_ab = index,
+      awayscore = details.awayScore,
+      homescore = details.homeScore,
+      outs = count.outs.start,
+      batter = matchup.batter.fullName,
+      pitcher = matchup.pitcher.fullName,
+      description = details.description
+    ) %>%
+    arrange(at_bat, pitch_in_ab, inning, half)
+}
+
+pbp_half_giants <- pbp_half(giants_game_id)
+pbp_half_angels <- pbp_half(angels_game_id)
+
+# Group by half-inning
+grouped <- function(pbp_data) {
+  pbp_data %>%
+    group_by(inning, half) %>%
+    group_split()
+}
+
+# Compose a nice text recap
+text_recap <- function(pbp_data) {
+  lines <- c()
+  for (half_frame in grouped(pbp_data)) {
+    this_inning <- half_frame$inning[1]
+    this_half <- half_frame$half[1]
+    header <- glue::glue("\n--- {stringr::str_to_title(this_half)} of Inning {this_inning} ---\n")
+    lines <- c(lines, header)
+    
+    for (i in seq_len(nrow(half_frame))) {
+      play <- half_frame[i, ]
+      play_line <- glue::glue(
+        "Batter: {play$batter} | Pitcher: {play$pitcher}\n  {play$description}"
+      )
+      lines <- c(lines, play_line)
+    }
+  }
+  return(lines)
+}
+
+#print("Creating text recap for Giants game...")
+#print(text_recap(pbp_half_giants))
+
+# Print first 50 lines in console for preview
 #cat(paste(lines[1:50], collapse="\n"))
