@@ -203,12 +203,13 @@ text_recap <- function(pbp_data) {
   return(lines)
 }
 
+# Markdown output for most non-complex data tables
 output_markdown <- function(box_score, file = "box_score.md") {
   # Generate Markdown table as a character vector
   md_table <- knitr::kable(box_score, format = "markdown")
   # Write to file
   writeLines(md_table, file)
-  cat("Box score table written to", file, "\n")
+  cat("Markdown table written to", file, "\n")
 }
 
 # Create Markdown output for half-inning tables (pitch-by-pitch)
