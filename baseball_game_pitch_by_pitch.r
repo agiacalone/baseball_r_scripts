@@ -74,9 +74,9 @@ team_games <- function(teamID, season) {
 }
 
 # Get all the games for a specific date
-date_games <- function(gameDate, season) {
+one_day_games <- function(date, season) {
   mlb_schedule(season) %>%
-    filter(date == gameDate) %>%
+  filter(date == date) %>%
     select(
       game_date,
       game_pk,
@@ -88,7 +88,7 @@ date_games <- function(gameDate, season) {
       home_id = teams_home_team_id,
       series_description
     ) %>%
-    mutate(game_date = with_tz(ymd_hms(game_date, tz = "UTC"), tzone = "America/Los_Angeles"))
+    mutate(game_date = with_tz(ymd_hms(game_date, tz = "UTC"), tzone = "America/Los_Angeles")) %>%
     mutate(
       game_datetime = ymd_hms(game_date),
       date = as.Date(game_datetime),
@@ -98,6 +98,7 @@ date_games <- function(gameDate, season) {
     select(date, time, everything()) %>%
     arrange(date, time)
 }
+
 
 # Function to retrieve standings for all MLB
 standings <- function(season, league_id) {
@@ -268,7 +269,7 @@ dodgers_games <- team_games(dodgersID, season)
 padres_games <- team_games(padresID, season)
 
 # Get the games for today's date
-date_games <- date_games(gameDate, season)
+day_games <- one_day_games(gameDate, season)
 
 # Get the standings for the American and National Leagues
 al_standings <- standings(season, league_id = 103)
@@ -318,7 +319,7 @@ padres_grouped <- grouped(pbp_half_padres)
 
 # Create some pretty Markdown outputs
 output_markdown(all_season_games, "all_season_games.md")
-output_markdown(date_games, "date_games.md")
+output_markdown(day_games, "date_games.md")
 output_markdown(giants_games, "giants_games.md")
 output_markdown(angels_games, "angels_games.md")
 output_markdown(dodgers_games, "dodgers_games.md")
