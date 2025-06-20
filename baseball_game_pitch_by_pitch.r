@@ -4,17 +4,51 @@ library(dplyr)
 library(glue)
 library(readr)
 
-season <- 2016
+season <- 2025
 
 # Get the game schedule for the given season
 games <- mlb_schedule(season=season)
+
+# Filtered games for a whole season
+season_games <- games %>%
+  filter(date == "2025-07-18") %>%
+  select(
+    date,
+    game_pk,
+    season,
+    day_night,
+    awayTeamName = teams_away_team_name,
+    away_id = teams_away_team_id,
+    away_score = teams_away_score,
+    homeTeamName = teams_home_team_name,
+    home_id = teams_home_team_id,
+    home_score= teams_home_score,
+    series_description,
+  ) %>%
+  arrange(date)
+
+# Get all games for a season by a team
+team_games <- games %>%
+  filter(teams_home_team_id == "137" | teams_away_team_id == "137") %>%
+  select(
+    date,
+    game_pk,
+    homeTeamName = teams_home_team_name,
+    home_id = teams_home_team_id,
+    awayTeamName = teams_away_team_name,
+    away_id = teams_away_team_id
+  ) %>%
+  arrange(date)
 
 # Retrosheet has data too
 retrosheet_gamelog <- get_retrosheet("play", season, "SFN")
 retrosheet_schedule <- get_retrosheet("schedule", season)
 
 # Find the game and create data frames
-game_id <- 777522  # replace with your game's gamePk
+#game_id <- 777522
+game_id <- season_games %>%
+  filter(home_id == 137 | away_id == 137) %>%
+  pull(game_pk)
 
 # Basic info for the game
 gameinfo <- mlb_game_info(game_id)
