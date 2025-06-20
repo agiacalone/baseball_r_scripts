@@ -99,7 +99,6 @@ one_day_games <- function(date, season) {
     arrange(date, time)
 }
 
-
 # Function to retrieve standings for all MLB
 standings <- function(season, league_id) {
   mlb_standings(season = season, league_id = league_id) %>%
@@ -334,9 +333,5 @@ write_half_inning_tables(giants_grouped, "giants_play_by_play.md")
 write_half_inning_tables(angels_grouped, "angels_play_by_play.md")
 write_half_inning_tables(dodgers_grouped, "dodgers_play_by_play.md")
 write_half_inning_tables(padres_grouped, "padres_play_by_play.md")
-
-# Create the text recaps for games
-#print(text_recap_giants <- text_recap(pbp_half_giants))
-#print(text_recap_angels <- text_recap(pbp_half_angels))
 
 ### END MAIN EXECUTION SECTION ###
