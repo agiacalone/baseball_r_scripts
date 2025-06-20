@@ -4,8 +4,14 @@ library(dplyr)
 library(glue)
 library(readr)
 
+season <- 2016
+
 # Get the game schedule for the given season
-games <- mlb_schedule(season="2016")
+games <- mlb_schedule(season=season)
+
+# Retrosheet has data too
+retrosheet_gamelog <- get_retrosheet("play", season, "SFN")
+retrosheet_schedule <- get_retrosheet("schedule", season)
 
 # Find the game and create data frames
 game_id <- 777522  # replace with your game's gamePk
