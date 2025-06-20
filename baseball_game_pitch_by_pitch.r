@@ -6,6 +6,7 @@ library(glue)
 library(tibble)
 library(readr)
 library(knitr)
+library(lubridate)
 
 #### BEGIN VARIABLE SECTION ####
 
@@ -23,9 +24,9 @@ padresID <- 135  # San Diego Padres
 
 # Filtered games for a whole season
 season_games <- function(season) {
-  mlb_schedule(season=season) %>%
+  mlb_schedule(season) %>%
     select(
-      date,
+      game_date,
       game_pk,
       awayScore = teams_away_score,
       homeScore = teams_home_score,
@@ -35,15 +36,22 @@ season_games <- function(season) {
       home_id = teams_home_team_id,
       series_description
     ) %>%
-    arrange(date)
+    mutate(
+      game_datetime = ymd_hms(game_date),
+      date = as.Date(game_datetime),
+      time = format(game_datetime, "%H:%M:%S")
+    ) %>%
+    select(-game_date, -game_datetime) %>%
+    select(date, time, everything()) %>%
+    arrange(date, time)
 }
 
 # Get all games for a season by a team
 team_games <- function(teamID, season) {
-  mlb_schedule(season=season) %>%
+  mlb_schedule(season) %>%
     filter(teams_home_team_id == teamID | teams_away_team_id == teamID) %>%
     select(
-      date,
+      game_date,
       game_pk,
       awayScore = teams_away_score,
       homeScore = teams_home_score,
@@ -53,15 +61,22 @@ team_games <- function(teamID, season) {
       home_id = teams_home_team_id,
       series_description
     ) %>%
-    arrange(date)
+    mutate(
+      game_datetime = ymd_hms(game_date),
+      date = as.Date(game_datetime),
+      time = format(game_datetime, "%H:%M:%S")
+    ) %>%
+    select(-game_date, -game_datetime) %>%
+    select(date, time, everything()) %>%
+    arrange(date, time)
 }
 
 # Get all the games for a specific date
 date_games <- function(gameDate, season) {
-  mlb_schedule(season=season) %>%
+  mlb_schedule(season) %>%
     filter(date == gameDate) %>%
     select(
-      date,
+      game_date,
       game_pk,
       awayScore = teams_away_score,
       homeScore = teams_home_score,
@@ -71,7 +86,14 @@ date_games <- function(gameDate, season) {
       home_id = teams_home_team_id,
       series_description
     ) %>%
-    arrange(date)
+    mutate(
+      game_datetime = ymd_hms(game_date),
+      date = as.Date(game_datetime),
+      time = format(game_datetime, "%H:%M:%S")
+    ) %>%
+    select(-game_date, -game_datetime) %>%
+    select(date, time, everything()) %>%
+    arrange(date, time)
 }
 
 # Function to retrieve standings for all MLB
