@@ -236,9 +236,11 @@ write_half_inning_tables <- function(grouped_list, file = "half_innings.md") {
 # Get the whole game schedule for the given season
 all_season_games <- season_games(season)
 
-# Get the games for a specific team for the whole season
+# Get the games for each team for the whole season
 giants_games <- team_games(giantsID, season)
 angels_games <- team_games(angelsID, season)
+dodgers_games <- team_games(dodgersID, season)
+padres_games <- team_games(padresID, season)
 
 # Get the games for today's date
 date_games <- date_games(gameDate, season)
@@ -247,45 +249,65 @@ date_games <- date_games(gameDate, season)
 al_standings <- standings(season, league_id = 103)
 nl_standings <- standings(season, league_id = 104)
 
-# Set the game ID for the SF Giants and LA Angels
+# Set the game ID for each team
 giants_game_id <- game_ident(giantsID, gameDate)
 angels_game_id <- game_ident(angelsID, gameDate)
+dodgers_game_id <- game_ident(dodgersID, gameDate)
+padres_game_id <- game_ident(padresID, gameDate)
 
-# Get info for Giants
+# Get info for the teams
 giants_game_info <- gameinfo(giants_game_id)
 angels_game_info <- gameinfo(angels_game_id)
+dodgers_game_info <- gameinfo(dodgers_game_id)
+padres_game_info <- gameinfo(padres_game_id)
 
 # Get the linescores to create the box scores
 giants_linescore <- mlb_game_linescore(giants_game_id)
 angels_linescore <- mlb_game_linescore(angels_game_id)
+dodgers_linescore <- mlb_game_linescore(dodgers_game_id)
+padres_linescore <- mlb_game_linescore(padres_game_id)
 
 # Make box score
 giants_boxscore <- make_box_score(giants_linescore)
 angels_boxscore <- make_box_score(angels_linescore)
+dodgers_boxscore <- make_box_score(dodgers_linescore)
+padres_boxscore <- make_box_score(padres_linescore)
 
 # Get the play-by-play data
 pbp_summary_giants <- pbp_summary(giants_game_id)
 pbp_summary_angels <- pbp_summary(angels_game_id)
+pbp_summary_dodgers <- pbp_summary(dodgers_game_id)
+pbp_summary_padres <- pbp_summary(padres_game_id)
 
 # Half-inning play-by-play
 pbp_half_giants <- pbp_half(giants_game_id)
 pbp_half_angels <- pbp_half(angels_game_id)
+pbp_half_dodgers <- pbp_half(dodgers_game_id)
+pbp_half_padres <- pbp_half(padres_game_id)
 
-# Group by team and half-inning
-#print(giants_grouped <- grouped(pbp_half_giants))
-#print(angels_grouped <- grouped(pbp_half_angels))
+# Group by team and half-inning for export
+giants_grouped <- grouped(pbp_half_giants)
+angels_grouped <- grouped(pbp_half_angels)
+dodgers_grouped <- grouped(pbp_half_dodgers)
+padres_grouped <- grouped(pbp_half_padres)
 
 # Create some pretty Markdown outputs
 output_markdown(all_season_games, "all_season_games.md")
 output_markdown(date_games, "date_games.md")
 output_markdown(giants_games, "giants_games.md")
 output_markdown(angels_games, "angels_games.md")
+output_markdown(dodgers_games, "dodgers_games.md")
+output_markdown(padres_games, "padres_games.md")
 output_markdown(al_standings, "al_standings.md")
 output_markdown(nl_standings, "nl_standings.md")
 output_markdown(giants_boxscore, "giants_box_score.md")
 output_markdown(angels_boxscore, "angels_box_score.md")
+output_markdown(dodgers_boxscore, "dodgers_box_score.md")
+output_markdown(padres_boxscore, "padres_box_score.md")
 write_half_inning_tables(giants_grouped, "giants_play_by_play.md")
 write_half_inning_tables(angels_grouped, "angels_play_by_play.md")
+write_half_inning_tables(dodgers_grouped, "dodgers_play_by_play.md")
+write_half_inning_tables(padres_grouped, "padres_play_by_play.md")
 
 # Create the text recaps for games
 #print(text_recap_giants <- text_recap(pbp_half_giants))
