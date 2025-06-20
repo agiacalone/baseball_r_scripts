@@ -3,8 +3,19 @@ library(dplyr)
 library(glue)
 library(readr)
 
+# Get the game schedule for the given season
+games <- mlb_schedule(season="2016")
+
 # Find the game and create data frames
 game_id <- 777522  # replace with your game's gamePk
+
+# Basic info for the game
+gameinfo <- mlb_game_info(game_id)
+
+# Get the linescore for the game
+linescore <- mlb_game_linescore(game_id)
+
+# Create the full play-by-play data
 pbp <- mlb_pbp(game_id)
 
 # Create the summary of the play-by-play game
@@ -15,6 +26,9 @@ pbp_summary <- pbp %>%
     inning = about.inning,
     half = about.halfInning,
     pitchnum = pitchNumber,
+    awayscore = details.awayScore,
+    homescore = details.homeScore,
+    outs = count.outs.start,
     detail = details.code,
     batter = matchup.batter.fullName,
     pitcher = matchup.pitcher.fullName,
@@ -29,6 +43,9 @@ pbp_half <- pbp %>%
     half = about.halfInning,
     at_bat = about.atBatIndex,
     pitch_in_ab = index,
+    awayscore = details.awayScore,
+    homescore = details.homeScore,
+    outs = count.outs.start,
     batter = matchup.batter.fullName,
     pitcher = matchup.pitcher.fullName,
     description = details.description
