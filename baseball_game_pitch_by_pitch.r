@@ -8,6 +8,11 @@ library(readr)
 season <- 2025
 gameDate <- "2025-06-18"
 teamID <- 137  # San Francisco Giants
+giantsID <- 137  # San Francisco Giants
+angelsID <- 108  # Los Angeles Angels
+dodgersID <- 119  # Los Angeles Dodgers
+metsID <- 121  # New York Mets
+padresID <- 135  # San Diego Padres
 
 # Get the whole game schedule for the given season
 games <- mlb_schedule(season=season)
@@ -93,9 +98,8 @@ retrosheet_gamelog <- get_retrosheet("play", season, "SFN")
 retrosheet_schedule <- get_retrosheet("schedule", season)
 
 # Find the game and create data frames
-#game_id <- 777522
-game_id <- season_games %>%
-  filter(home_id == 137 | away_id == 137) %>%
+game_id <- mlb_schedule(season=season) %>%
+  filter((teams_home_team_id == teamID | teams_away_team_id == teamID) & date == gameDate) %>%
   pull(game_pk)
 
 # Basic info for the game
@@ -105,11 +109,8 @@ gameinfo <- mlb_game_info(game_id)
 linescore <- mlb_game_linescore(game_id)
 info <- mlb_game_info(game_id)
 
-# Create the full play-by-play data
-pbp <- mlb_pbp(game_id)
-
 # Create the summary of the play-by-play game
-pbp_summary <- pbp %>%
+pbp_summary <- mlb_pbp(game_id) %>%
   select(
     at_bat = about.atBatIndex,
     pitch_in_ab = index,
@@ -127,7 +128,7 @@ pbp_summary <- pbp %>%
   arrange(at_bat, pitch_in_ab)
 
 # Select and sort
-pbp_half <- pbp %>%
+pbp_half <- mlb_pbp(game_id) %>%
   select(
     inning = about.inning,
     half = about.halfInning,
