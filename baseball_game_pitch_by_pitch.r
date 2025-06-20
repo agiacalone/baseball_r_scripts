@@ -1,17 +1,20 @@
 library(baseballr)
 library(retrosheet)
 library(dplyr)
+library(tidyverse)
 library(glue)
 library(readr)
 
 season <- 2025
+date <- "2025-06-18"
+teamID <- 137  # San Francisco Giants
 
 # Get the game schedule for the given season
 games <- mlb_schedule(season=season)
 
 # Filtered games for a whole season
 season_games <- games %>%
-  filter(date == "2025-07-18") %>%
+  filter(date == date) %>%
   select(
     date,
     game_pk,
@@ -29,7 +32,7 @@ season_games <- games %>%
 
 # Get all games for a season by a team
 team_games <- games %>%
-  filter(teams_home_team_id == "137" | teams_away_team_id == "137") %>%
+  filter(teams_home_team_id == teamID | teams_away_team_id == teamID) %>%
   select(
     date,
     game_pk,
@@ -39,6 +42,11 @@ team_games <- games %>%
     away_id = teams_away_team_id
   ) %>%
   arrange(date)
+
+# Get standings for the American League
+al_standings <- mlb_standings(season = season, league_id = 103)
+# Also get standings for the National League
+nl_standings <- mlb_standings(season = season, league_id = 104)
 
 # Retrosheet has data too
 retrosheet_gamelog <- get_retrosheet("play", season, "SFN")
@@ -120,4 +128,4 @@ for (half_frame in grouped) {
 write_lines(lines, "pbp_half_inning_recaps.txt")
 
 # Optional: print first 50 lines in console for preview
-cat(paste(lines[1:50], collapse="\n"))
+#cat(paste(lines[1:50], collapse="\n"))
