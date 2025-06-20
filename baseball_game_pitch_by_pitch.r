@@ -6,27 +6,27 @@ library(glue)
 library(readr)
 
 season <- 2025
-date <- "2025-06-18"
+gameDate <- "2025-06-18"
 teamID <- 137  # San Francisco Giants
 
 # Get the game schedule for the given season
 games <- mlb_schedule(season=season)
 
 # Filtered games for a whole season
-season_games <- games %>%
-  filter(date == date) %>%
+season_games <- mlb_schedule(season=season) %>%
+  filter(date == gameDate) %>%
   select(
     date,
     game_pk,
     season,
     day_night,
+    awayScore = teams_away_score,
+    homeScore = teams_home_score,
     awayTeamName = teams_away_team_name,
     away_id = teams_away_team_id,
-    away_score = teams_away_score,
     homeTeamName = teams_home_team_name,
     home_id = teams_home_team_id,
-    home_score= teams_home_score,
-    series_description,
+    series_description
   ) %>%
   arrange(date)
 
@@ -36,17 +36,57 @@ team_games <- games %>%
   select(
     date,
     game_pk,
+    awayScore = teams_away_score,
+    homeScore = teams_home_score,
+    awayTeamName = teams_away_team_name,
+    away_id = teams_away_team_id,
     homeTeamName = teams_home_team_name,
     home_id = teams_home_team_id,
+    series_description
+  ) %>%
+  arrange(date)
+
+# Get all the games for a specific date
+date_games <- games %>%
+  filter(date == gameDate) %>%
+  select(
+    date,
+    game_pk,
+    awayScore = teams_away_score,
+    homeScore = teams_home_score,
     awayTeamName = teams_away_team_name,
-    away_id = teams_away_team_id
+    away_id = teams_away_team_id,
+    homeTeamName = teams_home_team_name,
+    home_id = teams_home_team_id,
+    series_description
   ) %>%
   arrange(date)
 
 # Get standings for the American League
-al_standings <- mlb_standings(season = season, league_id = 103)
+al_standings <- mlb_standings(season = season, league_id = 103) %>%
+  select(
+    Rank = team_records_division_rank,
+    Division = division_id,
+    Team = team_records_team_name,
+    Wins = team_records_wins,
+    Losses = team_records_losses,
+    GB = team_records_games_back,
+    WLpct = team_records_winning_percentage
+  ) %>%
+  arrange(Division, as.numeric(Rank))
+
 # Also get standings for the National League
-nl_standings <- mlb_standings(season = season, league_id = 104)
+nl_standings <- mlb_standings(season = season, league_id = 104) %>%
+  select(
+    Rank = team_records_division_rank,
+    Division = division_id,
+    Team = team_records_team_name,
+    Wins = team_records_wins,
+    Losses = team_records_losses,
+    GB = team_records_games_back,
+    WLpct = team_records_winning_percentage
+  ) %>%
+  arrange(Division, as.numeric(Rank))
 
 # Retrosheet has data too
 retrosheet_gamelog <- get_retrosheet("play", season, "SFN")
