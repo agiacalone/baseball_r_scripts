@@ -9,7 +9,7 @@ season <- 2025
 gameDate <- "2025-06-18"
 teamID <- 137  # San Francisco Giants
 
-# Get the game schedule for the given season
+# Get the whole game schedule for the given season
 games <- mlb_schedule(season=season)
 
 # Filtered games for a whole season
@@ -31,7 +31,7 @@ season_games <- mlb_schedule(season=season) %>%
   arrange(date)
 
 # Get all games for a season by a team
-team_games <- games %>%
+team_games <- mlb_schedule(season=season) %>%
   filter(teams_home_team_id == teamID | teams_away_team_id == teamID) %>%
   select(
     date,
@@ -47,7 +47,7 @@ team_games <- games %>%
   arrange(date)
 
 # Get all the games for a specific date
-date_games <- games %>%
+date_games <- mlb_schedule(season=season) %>%
   filter(date == gameDate) %>%
   select(
     date,
