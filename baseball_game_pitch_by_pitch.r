@@ -272,10 +272,11 @@ pbp_half_giants <- pbp_half(giants_game_id)
 pbp_half_angels <- pbp_half(angels_game_id)
 
 # Group by team and half-inning
-print(giants_grouped <- grouped(pbp_half_giants))
-print(angels_grouped <- grouped(pbp_half_angels))
+#print(giants_grouped <- grouped(pbp_half_giants))
+#print(angels_grouped <- grouped(pbp_half_angels))
 
 # Create some pretty Markdown outputs
+output_markdown(all_season_games, "all_season_games.md")
 output_markdown(date_games, "date_games.md")
 output_markdown(giants_games, "giants_games.md")
 output_markdown(angels_games, "angels_games.md")
