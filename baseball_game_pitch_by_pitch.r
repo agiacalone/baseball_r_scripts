@@ -6,35 +6,36 @@ library(glue)
 library(tibble)
 library(readr)
 
+#### BEGIN VARIABLE SECTION ####
+
 season <- 2025
 gameDate <- "2025-06-19"
-#teamID <- 137  # San Francisco Giants
 giantsID <- 137  # San Francisco Giants
 angelsID <- 108  # Los Angeles Angels
 dodgersID <- 119  # Los Angeles Dodgers
 metsID <- 121  # New York Mets
 padresID <- 135  # San Diego Padres
 
-# Get the whole game schedule for the given season
-all_games <- mlb_schedule(season=season)
+#### END VARIABLE SECTION ####
+
+#### BEGIN FUNCTIONS SECTION ####
 
 # Filtered games for a whole season
-season_games <- mlb_schedule(season=season) %>%
-  filter(date == gameDate) %>%
-  select(
-    date,
-    game_pk,
-    season,
-    day_night,
-    awayScore = teams_away_score,
-    homeScore = teams_home_score,
-    awayTeamName = teams_away_team_name,
-    away_id = teams_away_team_id,
-    homeTeamName = teams_home_team_name,
-    home_id = teams_home_team_id,
-    series_description
-  ) %>%
-  arrange(date)
+season_games <- function(season) {
+  mlb_schedule(season=season) %>%
+    select(
+      date,
+      game_pk,
+      awayScore = teams_away_score,
+      homeScore = teams_home_score,
+      awayTeamName = teams_away_team_name,
+      away_id = teams_away_team_id,
+      homeTeamName = teams_home_team_name,
+      home_id = teams_home_team_id,
+      series_description
+    ) %>%
+    arrange(date)
+}
 
 # Get all games for a season by a team
 team_games <- function(teamID, season) {
@@ -54,27 +55,25 @@ team_games <- function(teamID, season) {
     arrange(date)
 }
 
-# Get the Giants games for the season
-giants_games <- team_games(giantsID, season)
-angels_games <- team_games(angelsID, season)
-
 # Get all the games for a specific date
-date_games <- mlb_schedule(season=season) %>%
-  filter(date == gameDate) %>%
-  select(
-    date,
-    game_pk,
-    awayScore = teams_away_score,
-    homeScore = teams_home_score,
-    awayTeamName = teams_away_team_name,
-    away_id = teams_away_team_id,
-    homeTeamName = teams_home_team_name,
-    home_id = teams_home_team_id,
-    series_description
-  ) %>%
-  arrange(date)
+date_games <- function(gameDate, season) {
+  mlb_schedule(season=season) %>%
+    filter(date == gameDate) %>%
+    select(
+      date,
+      game_pk,
+      awayScore = teams_away_score,
+      homeScore = teams_home_score,
+      awayTeamName = teams_away_team_name,
+      away_id = teams_away_team_id,
+      homeTeamName = teams_home_team_name,
+      home_id = teams_home_team_id,
+      series_description
+    ) %>%
+    arrange(date)
+}
 
-# Get standings for the American League
+# Function to retrieve standings for all MLB
 standings <- function(season, league_id) {
   mlb_standings(season = season, league_id = league_id) %>%
     select(
@@ -89,10 +88,6 @@ standings <- function(season, league_id) {
     arrange(Division, as.numeric(Rank))
 }
 
-# Get the standings for the American and National Leagues
-al_standings <- standings(season, league_id = 103)
-nl_standings <- standings(season, league_id = 104)
-
 # Get the game ID for a specific game date and team
 game_ident <- function(teamID, gameDate) {
   game_ident <- mlb_schedule(season=season) %>%
@@ -100,23 +95,10 @@ game_ident <- function(teamID, gameDate) {
   pull(game_pk)
   }
 
-# Set the game ID for the SF Giants and LA Angels
-giants_game_id <- game_ident(giantsID, gameDate)
-angels_game_id <- game_ident(angelsID, gameDate)
-
 # Basic info for the game
 gameinfo <- function(game_ident) {
   mlb_game_info(game_ident)
 }
-
-# Get info for Giants
-giants_game_info <- gameinfo(giants_game_id)
-angels_game_info <- gameinfo(angels_game_id)
-
-# Get the linescore and basic info for the game
-#linescore <- mlb_game_linescore(game_id)
-giants_linescore <- mlb_game_linescore(giants_game_id)
-angels_linescore <- mlb_game_linescore(angels_game_id)
 
 # Function to create box score
 make_box_score <- function(linescore) {
@@ -155,10 +137,6 @@ make_box_score <- function(linescore) {
   return(box_score)
 }
 
-# Make box score
-giants_boxscore <- make_box_score(giants_linescore)
-angels_boxscore <- make_box_score(angels_linescore)
-
 # Create the summary of the play-by-play game
 pbp_summary <- function(game_ident) {
   mlb_pbp(game_ident) %>%
@@ -179,12 +157,6 @@ pbp_summary <- function(game_ident) {
     arrange(at_bat, pitch_in_ab)
 }
 
-# Get the play-by-play data for the Giants game
-pbp_summary_giants <- pbp_summary(giants_game_id)
-
-# Get the play-by-play data for the Angels game
-pbp_summary_angels <- pbp_summary(angels_game_id)
-
 # Select and sort
 pbp_half <- function(game_ident) {
   mlb_pbp(game_ident) %>%
@@ -202,9 +174,6 @@ pbp_half <- function(game_ident) {
     ) %>%
     arrange(at_bat, pitch_in_ab, inning, half)
 }
-
-pbp_half_giants <- pbp_half(giants_game_id)
-pbp_half_angels <- pbp_half(angels_game_id)
 
 # Group by half-inning
 grouped <- function(pbp_data) {
@@ -233,8 +202,54 @@ text_recap <- function(pbp_data) {
   return(lines)
 }
 
-#print("Creating text recap for Giants game...")
-#print(text_recap(pbp_half_giants))
+### END FUNCTIONS SECTION ###
 
-# Print first 50 lines in console for preview
-#cat(paste(lines[1:50], collapse="\n"))
+### BEGIN MAIN EXECUTION SECTION ###
+
+# Get the whole game schedule for the given season
+all_season_games <- season_games(season)
+
+# Get the games for a specific team for the whole season
+giants_games <- team_games(giantsID, season)
+angels_games <- team_games(angelsID, season)
+
+# Get the games for today's date
+date_games <- date_games(gameDate, season)
+
+# Get the standings for the American and National Leagues
+al_standings <- standings(season, league_id = 103)
+nl_standings <- standings(season, league_id = 104)
+
+# Set the game ID for the SF Giants and LA Angels
+giants_game_id <- game_ident(giantsID, gameDate)
+angels_game_id <- game_ident(angelsID, gameDate)
+
+# Get info for Giants
+giants_game_info <- gameinfo(giants_game_id)
+angels_game_info <- gameinfo(angels_game_id)
+
+# Get the linescores to create the box scores
+giants_linescore <- mlb_game_linescore(giants_game_id)
+angels_linescore <- mlb_game_linescore(angels_game_id)
+
+# Make box score
+giants_boxscore <- make_box_score(giants_linescore)
+angels_boxscore <- make_box_score(angels_linescore)
+
+# Get the play-by-play data
+pbp_summary_giants <- pbp_summary(giants_game_id)
+pbp_summary_angels <- pbp_summary(angels_game_id)
+
+# Half-inning play-by-play
+pbp_half_giants <- pbp_half(giants_game_id)
+pbp_half_angels <- pbp_half(angels_game_id)
+
+# Group by team and half-inning
+print(giants_grouped <- grouped(pbp_half_giants))
+print(angels_grouped <- grouped(pbp_half_angels))
+
+# Create the text recaps for games
+#print(text_recap_giants <- text_recap(pbp_half_giants))
+#print(text_recap_angels <- text_recap(pbp_half_angels))
+
+### END MAIN EXECUTION SECTION ###
