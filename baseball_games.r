@@ -11,7 +11,8 @@ library(lubridate)
 #### BEGIN VARIABLE SECTION ####
 
 season <- 2025
-gameDate <- "2025-06-19"
+gameDate <- "2025-06-20"
+today <- Sys.Date()
 giantsID <- 137  # San Francisco Giants
 angelsID <- 108  # Los Angeles Angels
 dodgersID <- 119  # Los Angeles Dodgers
@@ -83,9 +84,9 @@ team_games <- function(teamID, season) {
 }
 
 # Get all the games for a specific date
-one_day_games <- function(date, season) {
+one_day_games <- function(date_ofgame, season) {
   mlb_schedule(season) %>%
-  filter(date == date) %>%
+    filter(date == as.Date(date_ofgame)) %>%
     select(
       game_date,
       game_pk,
