@@ -22,6 +22,18 @@ padresID <- 135  # San Diego Padres
 
 #### BEGIN FUNCTIONS SECTION ####
 
+# Get team names and IDs
+team_ids <- function(season) {
+  mlb_teams(season=season) %>%
+    select(
+      team_id, 
+      team_abbreviation, 
+      teamname = team_full_name, 
+      league_id
+    ) %>%
+    mutate(teamname = str_to_title(teamname))
+}
+
 # Filtered games for a whole season
 season_games <- function(season) {
   mlb_schedule(season) %>%
@@ -31,9 +43,7 @@ season_games <- function(season) {
       awayScore = teams_away_score,
       homeScore = teams_home_score,
       awayTeamName = teams_away_team_name,
-      away_id = teams_away_team_id,
       homeTeamName = teams_home_team_name,
-      home_id = teams_home_team_id,
       series_description
     ) %>%
     mutate(game_date = with_tz(ymd_hms(game_date, tz = "UTC"), tzone = "America/Los_Angeles")) %>%
@@ -57,9 +67,7 @@ team_games <- function(teamID, season) {
       awayScore = teams_away_score,
       homeScore = teams_home_score,
       awayTeamName = teams_away_team_name,
-      away_id = teams_away_team_id,
       homeTeamName = teams_home_team_name,
-      home_id = teams_home_team_id,
       series_description
     ) %>%
     mutate(game_date = with_tz(ymd_hms(game_date, tz = "UTC"), tzone = "America/Los_Angeles")) %>%
@@ -83,9 +91,7 @@ one_day_games <- function(date, season) {
       awayScore = teams_away_score,
       homeScore = teams_home_score,
       awayTeamName = teams_away_team_name,
-      away_id = teams_away_team_id,
       homeTeamName = teams_home_team_name,
-      home_id = teams_home_team_id,
       series_description
     ) %>%
     mutate(game_date = with_tz(ymd_hms(game_date, tz = "UTC"), tzone = "America/Los_Angeles")) %>%
@@ -257,6 +263,9 @@ write_half_inning_tables <- function(grouped_list, file = "half_innings.md") {
 ### END FUNCTIONS SECTION ###
 
 ### BEGIN MAIN EXECUTION SECTION ###
+
+# Get all teams and their IDs
+teams <- team_ids(season)
 
 # Get the whole game schedule for the given season
 all_season_games <- season_games(season)
