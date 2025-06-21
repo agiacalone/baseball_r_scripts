@@ -25,6 +25,7 @@ padresID <- 135  # San Diego Padres
 # Get team names and IDs
 team_ids <- function(season) {
   mlb_teams(season=season) %>%
+    filter(league_id == 103 | league_id == 104) %>%
     select(
       team_id, 
       team_abbreviation, 
@@ -264,7 +265,7 @@ write_half_inning_tables <- function(grouped_list, file = "half_innings.md") {
 
 ### BEGIN MAIN EXECUTION SECTION ###
 
-# Get all teams and their IDs
+# Get all MLB teams and their IDs
 teams <- team_ids(season)
 
 # Get the whole game schedule for the given season
