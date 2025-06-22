@@ -2,17 +2,6 @@
 
 teamID <- 108 # Los Angeles Angels
 
-# Load the required libraries
-library(baseballr)
-library(retrosheet)
-library(dplyr)
-library(tidyverse)
-library(glue)
-library(tibble)
-library(readr)
-library(knitr)
-library(lubridate)
-
 # Source our working R scripts
 source ("R/team_games.R")
 source ("R/date_game.R")

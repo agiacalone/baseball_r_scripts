@@ -1,16 +1,5 @@
 ### Get the current standings for MLB
 
-# Load the required libraries
-library(baseballr)
-library(retrosheet)
-library(dplyr)
-library(tidyverse)
-library(glue)
-library(tibble)
-library(readr)
-library(knitr)
-library(lubridate)
-
 # Source our working R scripts
 source ("R/combined_standings.R")
 source ("R/standings.R")
