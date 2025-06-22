@@ -3,6 +3,4 @@
 .RData
 .Ruserdata
 .DS_Store
-output/*.md
-output/Angels/*.md
-output/Giants/*.md
+output/*

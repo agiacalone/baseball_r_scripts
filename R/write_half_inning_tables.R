@@ -12,6 +12,7 @@ write_half_inning_tables <- function(grouped_list, file = "half_innings.md") {
       "\n"
     )
   }
+  dir.create(dirname(file), recursive = TRUE, showWarnings = FALSE)
   writeLines(output, file)
   cat("Markdown table written to", file, "\n")
 }
