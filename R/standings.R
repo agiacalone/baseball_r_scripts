@@ -23,5 +23,6 @@ standings <- function(season, type, league_id) {
         TRUE ~ as.character(Division)
       )
     ) %>%
+    select(-standings_type) %>%
     arrange(Division, as.numeric(Rank), desc(as.numeric(WLPct)))
 }
