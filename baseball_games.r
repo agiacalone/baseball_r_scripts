@@ -11,7 +11,7 @@ library(lubridate)
 #### BEGIN VARIABLE SECTION ####
 
 season <- 2025
-gameDate <- "2025-06-20"
+gameDate <- "2025-06-21"
 today <- Sys.Date()
 giantsID <- 137  # San Francisco Giants
 angelsID <- 108  # Los Angeles Angels
@@ -119,7 +119,26 @@ standings <- function(season, league_id) {
       GB = team_records_games_back,
       WLPct = team_records_winning_percentage
     ) %>%
-    arrange(Division, as.numeric(Rank))
+    arrange(Division, as.numeric(Rank), desc(as.numeric(WLPct)))
+}
+
+# Function to retrieve combined standings for all MLB
+comb_standings <- function(season) {
+  al <- mlb_standings(season = season, league_id = 103)
+  nl <- mlb_standings(season = season, league_id = 104)
+  bind_rows(al, nl) %>%
+    select(
+      Div_Rank = team_records_division_rank,
+      Division = division_id,
+      Team = team_records_team_name,
+      Wins = team_records_wins,
+      Losses = team_records_losses,
+      GB = team_records_games_back,
+      WLPct = team_records_winning_percentage
+    ) %>%
+    arrange(desc(as.numeric(WLPct)), as.numeric(Div_Rank)) %>%
+    mutate(OverallRank = row_number()) %>%
+    select(OverallRank, everything())
 }
 
 # Get the game ID for a specific game date and team
@@ -284,6 +303,9 @@ day_games <- one_day_games(gameDate, season)
 # Get the standings for the American and National Leagues
 al_standings <- standings(season, league_id = 103)
 nl_standings <- standings(season, league_id = 104)
+
+# Create the combined standings for both leagues
+combined_standings <- comb_standings(season)
 
 # Set the game ID for each team
 giants_game_id <- game_ident(giantsID, gameDate)
