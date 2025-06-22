@@ -1,8 +1,13 @@
 # Get one day's game for a team
 
-date_game <- function(today_game_id, season) {
+date_game <- function(game_id, season) {
+  # Handle NULL or missing game_id
+  if (is.null(game_id) || length(game_id) == 0 || (length(game_id) == 1 && is.na(game_id))) {
+    message("No valid game_id provided. Returning empty data frame.")
+    return(tibble::tibble())
+  }
   mlb_schedule(season) %>%
-    filter(game_pk == today_game_id) %>%
+    filter(game_pk == game_id) %>%
     select(
       game_date,
       game_pk,

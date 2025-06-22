@@ -16,13 +16,15 @@ source ("R/write_half_inning_tables.R")
 # Get the game IDs for today's and yesterday's games
 today_game_id <- game_ident(teamID, today)
 yesterday_game_id <- game_ident(teamID, yesterday)
+tomorrow_game_id <- game_ident(teamID, tomorrow)
 
 # Create output for all the team's games for the whole season
 output_markdown(team_games(teamID, season), "output/Giants/giants_all_season_games.md")
 
-# Get just today's and yesterday's games
+# Get just today's, yesterday's, and tomorrow's games
 output_markdown(date_game(today_game_id, season), "output/Giants/giants_today_game.md")
 output_markdown(date_game(yesterday_game_id, season), "output/Giants/giants_yesterday_game.md")
+output_markdown(date_game(tomorrow_game_id, season), "output/Giants/giants_tomorrow_game.md")
 
 # Create player stats
 

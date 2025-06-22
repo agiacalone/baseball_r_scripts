@@ -30,7 +30,7 @@ tomorrow <- today + 1
 #source ("scripts/get_standings.R")
 
 ## Get info on specific teams
-#source ("scripts/giants.R")
+source ("scripts/giants.R")
 #source ("scripts/angels.R")
 #source ("scripts/padres.R")
 #source ("scripts/dodgers.R")
