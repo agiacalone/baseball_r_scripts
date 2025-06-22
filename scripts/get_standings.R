@@ -1,8 +1,5 @@
 ### Get the current standings for MLB
 
-season = 2025
-today <- Sys.Date()
-
 # Load the required libraries
 library(baseballr)
 library(retrosheet)

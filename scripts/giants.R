@@ -1,9 +1,6 @@
 ### Variables for the San Francisco Giants
 
-season = 2025
 teamID <- 137 # San Francisco Giants
-today <- Sys.Date()
-yesterday <- today - 1
 
 # Load the required libraries
 library(baseballr)

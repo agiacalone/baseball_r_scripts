@@ -1,9 +1,6 @@
 ### Variables for the Los Angeles Angels
 
-season = 2025
 teamID <- 108 # Los Angeles Angels
-today <- Sys.Date()
-yesterday <- today - 1
 
 # Load the required libraries
 library(baseballr)

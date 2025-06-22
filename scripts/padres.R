@@ -1,9 +1,6 @@
 ### Variables for San Diego Padres
 
-season = 2025
 teamID <- 135 # San Diego Padres
-today <- Sys.Date()
-yesterday <- today - 1
 
 # Load the required libraries
 library(baseballr)

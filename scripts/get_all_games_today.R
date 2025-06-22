@@ -1,9 +1,5 @@
 ### Get today's games
 
-season = 2025
-today <- Sys.Date()
-yesterday <- today - 1
-
 # Load the required libraries
 library(baseballr)
 library(retrosheet)

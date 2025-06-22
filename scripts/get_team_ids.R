@@ -1,7 +1,5 @@
 ### Get list of all team IDs
 
-season = 2025
-
 # Load the required libraries
 library(baseballr)
 library(retrosheet)

@@ -1,7 +1,5 @@
 ### Get all the games for a specific season
 
-season = 2025
-
 # Load the required libraries
 library(baseballr)
 library(retrosheet)
