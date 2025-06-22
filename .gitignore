@@ -4,4 +4,5 @@
 .Ruserdata
 .DS_Store
 output/*.md
-output/*/*.md
+output/Angels/*.md
+output/Giants/*.md
