@@ -35,6 +35,8 @@ output_markdown(team_games(teamID, season), "output/Giants/giants_all_season_gam
 output_markdown(date_game(today_game_id, season), "output/Giants/giants_today_game.md")
 output_markdown(date_game(yesterday_game_id, season), "output/Giants/giants_yesterday_game.md")
 
+# Create player stats
+
 # Create output file for the games' box scores
 output_markdown(make_box_score(mlb_game_linescore(game_ident(teamID, today))), "output/Giants/giants_today_box_score.md")
 output_markdown(make_box_score(mlb_game_linescore(game_ident(teamID, yesterday))), "output/Giants/giants_yesterday_box_score.md")

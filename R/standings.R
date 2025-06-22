@@ -1,8 +1,9 @@
 # Function to retrieve league standings for all MLB
 
-standings <- function(season, league_id) {
+standings <- function(season, type, league_id) {
   mlb_standings(season = season, league_id = league_id) %>%
     select(
+      standings_type,
       Rank = team_records_division_rank,
       Division = division_id,
       Team = team_records_team_name,
