@@ -14,5 +14,6 @@ pbp_half <- function(game_ident) {
       pitcher = matchup.pitcher.fullName,
       description = details.description
     ) %>%
-    arrange(at_bat, pitch_in_ab, inning, half)
+    mutate(half = factor(half, levels = c("top", "bottom"))) %>%
+    arrange(inning, half, at_bat, pitch_in_ab)
 }
