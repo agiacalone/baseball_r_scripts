@@ -18,9 +18,10 @@ yesterday <- today - 1
 tomorrow <- today + 1
 
 ## Get info on games
-source ("scripts/all_games_for_season.R")
-source ("scripts/get_all_games_yesterday.R")
-source ("scripts/get_all_games_today.R")
+#source ("scripts/all_games_for_season.R")
+#source ("scripts/get_all_games_yesterday.R")
+#source ("scripts/get_all_games_today.R")
+#source ("scripts/get_all_games_tomorrow.R")
 
 ## Get info on the teams
 #source ("scripts/get_team_ids.R")
