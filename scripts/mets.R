@@ -16,6 +16,7 @@ source ("R/write_half_inning_tables.R")
 # Get the game IDs for today's and yesterday's games
 today_game_id <- game_ident(teamID, today)
 yesterday_game_id <- game_ident(teamID, yesterday)
+tomorrow_game_id <- game_ident(teamID, tomorrow)
 
 # Create output for all the team's games for the whole season
 output_markdown(team_games(teamID, season), "output/Mets/mets_all_season_games.md")
@@ -23,6 +24,7 @@ output_markdown(team_games(teamID, season), "output/Mets/mets_all_season_games.m
 # Get just today's and yesterday's games
 output_markdown(date_game(today_game_id, season), "output/Mets/mets_today_game.md")
 output_markdown(date_game(yesterday_game_id, season), "output/Mets/mets_yesterday_game.md")
+output_markdown(date_game(tomorrow_game_id, season), "output/Mets/mets_tomorrow_game.md")
 
 # Create output file for the games' box scores
 output_markdown(make_box_score(mlb_game_linescore(game_ident(teamID, today))), "output/Mets/mets_today_box_score.md")
