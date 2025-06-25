@@ -5,7 +5,7 @@ wildcard_standings <- function(season, league_id) {
     standings_type = "wildCard"
   ) %>%
     select(
-      Rank = team_records_league_rank,
+      Div_Rank = team_records_division_rank,
       Division = division_id,
       Team = team_records_team_name,
       Wins = team_records_wins,
@@ -13,5 +13,14 @@ wildcard_standings <- function(season, league_id) {
       GB = team_records_games_back,
       WLPct = team_records_winning_percentage
     ) %>%
-    arrange(as.numeric(Rank), desc(as.numeric(WLPct)))
+    arrange(as.numeric(Div_Rank), desc(as.numeric(WLPct))) %>%
+  mutate(
+    Division = case_when(
+      Division == 201 ~ "AL Wild",
+      Division == 204 ~ "NL Wild",
+      TRUE ~ as.character(Division)
+    )
+  ) %>%
+    mutate(OverallRank = row_number()) %>%
+    select(OverallRank, everything())
 }
