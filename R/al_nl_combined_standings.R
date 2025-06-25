@@ -1,6 +1,6 @@
 # Function to retrieve combined standings for all MLB
 
-combined_standings <- function(season) {
+al_nl_combined_standings <- function(season) {
   al <- mlb_standings(season = season, league_id = 103)
   nl <- mlb_standings(season = season, league_id = 104)
   bind_rows(al, nl) %>%

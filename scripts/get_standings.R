@@ -1,7 +1,7 @@
 ### Get the current standings for MLB
 
 # Source our working R scripts
-source ("R/combined_standings.R")
+source ("R/al_nl_combined_standings.R")
 source ("R/combined_intraleague_standings.R")
 source ("R/standings.R")
 source ("R/wildcard_standings.R")
