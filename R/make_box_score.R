@@ -1,6 +1,9 @@
 # Function to create box score from linescore output
 
 make_box_score <- function(linescore) {
+  if (is.null(linescore) || !is.data.frame(linescore) || nrow(linescore) == 0) {
+    return(tibble(Inning = character(), Away = character(), Home = character()))
+  }
   innings <- linescore$num
   away_runs_by_inning <- as.character(linescore$away_runs)
   home_runs_by_inning <- as.character(linescore$home_runs)
