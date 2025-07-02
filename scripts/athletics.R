@@ -27,8 +27,8 @@ output_markdown(date_game(yesterday_game_id, season), "output/Athletics/athletic
 output_markdown(date_game(tomorrow_game_id, season), "output/Athletics/athletics_tomorrow_game.md")
 
 # Create output file for the games' box scores
-output_markdown(make_box_score(mlb_game_linescore(game_ident(teamID, today))), "output/Athletics/athletics_today_box_score.md")
-output_markdown(make_box_score(mlb_game_linescore(game_ident(teamID, yesterday))), "output/Athletics/athletics_yesterday_box_score.md")
+output_markdown(make_box_score(teamID, today), "output/Athletics/athletics_today_box_score.md")
+output_markdown(make_box_score(teamID, yesterday), "output/Athletics/athletics_yesterday_box_score.md")
 
 # Create output file for the games' play-by-play summaries
 write_half_inning_tables(grouped(pbp_half(today_game_id)), "output/Athletics/athletics_today_play_by_play.md")

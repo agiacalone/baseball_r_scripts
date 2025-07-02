@@ -1,17 +1,24 @@
-# Function to create box score from linescore output
+library(tibble)
 
-make_box_score <- function(linescore) {
+make_box_score <- function(teamID, date) {
+  gid <- game_ident(teamID, date)
+  if (is.null(gid) || length(gid) == 0) {
+    message(sprintf("No game found for team %s on %s. Skipping output.", teamID, date))
+    # Return an empty tibble (safe default structure)
+    return(tibble(Inning = character(), Away = character(), Home = character()))
+  }
+  linescore <- mlb_game_linescore(gid)
   if (is.null(linescore) || !is.data.frame(linescore) || nrow(linescore) == 0) {
     return(tibble(Inning = character(), Away = character(), Home = character()))
   }
+  
   innings <- linescore$num
   away_runs_by_inning <- as.character(linescore$away_runs)
   home_runs_by_inning <- as.character(linescore$home_runs)
   away_team <- unique(linescore$away_team_name)
   home_team <- unique(linescore$home_team_name)
-  # Helper for last non-NA value
+  
   last_non_na <- function(x) tail(x[!is.na(x)], 1)
-  # Totals
   away_runs_total <- as.character(sum(as.numeric(linescore$away_runs), na.rm = TRUE))
   home_runs_total <- as.character(sum(as.numeric(linescore$home_runs), na.rm = TRUE))
   away_hits_total <- as.character(sum(as.numeric(linescore$away_hits), na.rm = TRUE))

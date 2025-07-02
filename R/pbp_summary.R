@@ -8,6 +8,23 @@ pbp_summary <- function(game_ident) {
     }
   )
   
+  if (is.null(pbp) || length(pbp) == 0) {
+    return(tibble(
+      at_bat = integer(),
+      pitch_in_ab = integer(),
+      inning = integer(),
+      half = factor(levels = c("top", "bottom")),
+      pitchnum = integer(),
+      awayscore = integer(),
+      homescore = integer(),
+      outs = integer(),
+      detail = character(),
+      batter = character(),
+      pitcher = character(),
+      description = character()
+    ))
+  }
+  
   # Return an empty tibble with correct columns if no data
   if (is.null(pbp) || nrow(pbp) == 0) {
     return(tibble(
