@@ -4,4 +4,6 @@
 .Ruserdata
 .DS_Store
 .claude
+src/_*
 output/*
+.idea
